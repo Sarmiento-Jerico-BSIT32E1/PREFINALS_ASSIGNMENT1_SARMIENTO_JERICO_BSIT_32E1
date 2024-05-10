@@ -1,33 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 
-namespace AUTH_SEVER.Controllers
+namespace ProtectedApi
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class ValueController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
+        private readonly string _owner = "Jerico J Q. Sarmiento";
+        private readonly Random _random = new Random();
+        private readonly string[] _thingsAboutOwner = new[]
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            "Studying at Lyceum of Alabang",
+            "Course:BSIT",
+            "Age:22",
+            "Supreme Student Council BSIT Representative / Director for Internal Activities",
+
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        [HttpGet("about/me")]
+        public IActionResult AboutMe()
         {
-            _logger = logger;
+            var thing = _thingsAboutOwner[_random.Next(_thingsAboutOwner.Length)];
+            return Ok(thing);
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpGet("about")]
+        public IActionResult About()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return Ok(_owner);
         }
+
+        [HttpPost("about")]
+        public IActionResult About([FromBody] NameModel model)
+        {
+            return Ok($"Hi {model.Name} from {_owner}");
+        }
+    }
+
+    public class NameModel
+    {
+        public string? Name { get; set; }
     }
 }
